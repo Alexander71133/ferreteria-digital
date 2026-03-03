@@ -1,95 +1,44 @@
 import os
-import sqlite3
+import pandas as pd # Necesitaremos instalar esta librería
 from flask import Flask, render_template, request, redirect, url_for
-from werkzeug.utils import secure_filename
-import urllib.parse
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 
-# Configuración básica
-UPLOAD_FOLDER = 'static/uploads'
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Configuración de Base de Datos
+app.config['SQLALCHEMY_DATABASE_DATABASE_URI'] = 'sqlite:///ferreteria.db'
+app.config['UPLOAD_FOLDER'] = 'static/uploads'
+db = SQLAlchemy(app)
 
-# --- BASE DE DATOS ---
-def init_db():
-    conn = sqlite3.connect('ferreteria.db')
-    cursor = conn.cursor()
-    cursor.execute('''CREATE TABLE IF NOT EXISTS productos 
-                      (id INTEGER PRIMARY KEY AUTOINCREMENT, nombre TEXT, precio REAL, imagen TEXT, stock INTEGER)''')
-    conn.commit()
-    conn.close()
+class Producto(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(100))
+    precio = db.Column(db.Float)
+    stock = db.Column(db.Integer)
+    imagen = db.Column(db.String(200))
 
-init_db()
-
-# --- RUTA PÚBLICA (EL CATÁLOGO) ---
-@app.route('/')
-def home():
-    search = request.args.get('search')
-    conn = sqlite3.connect('ferreteria.db')
-    conn.row_factory = sqlite3.Row
-    
-    if search:
-        productos_db = conn.execute("SELECT * FROM productos WHERE nombre LIKE ?", ('%' + search + '%',)).fetchall()
-    else:
-        productos_db = conn.execute('SELECT * FROM productos').fetchall()
-    conn.close()
-    
-    productos = []
-    for row in productos_db:
-        p = dict(row)
-        # RECUERDA: Cambia el número abajo por tu WhatsApp real
-        msg = urllib.parse.quote(f"Hola, me interesa el {p['nombre']}")
-        p['link_ws'] = f"https://wa.me/573016426407?text={msg}"
-        productos.append(p)
-    
-    return render_template('index.html', productos=productos, busqueda=search)
-
-# --- RUTA ADMIN (EL PANEL) ---
-@app.route('/admin')
-def admin_panel():
-    conn = sqlite3.connect('ferreteria.db')
-    conn.row_factory = sqlite3.Row
-    productos = conn.execute('SELECT * FROM productos').fetchall()
-    conn.close()
-    return render_template('admin.html', productos=productos)
-
-# --- ACCIÓN: AGREGAR PRODUCTO ---
-@app.route('/admin/add', methods=['POST'])
-def add_product():
-    file = request.files['foto']
+# --- RUTA PARA CARGA MASIVA ---
+@app.route('/importar', methods=['POST'])
+def importar():
+    file = request.files['archivo_excel']
     if file:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        img_path = f'/static/uploads/{filename}'
-        
-        conn = sqlite3.connect('ferreteria.db')
-        conn.execute('INSERT INTO productos (nombre, precio, imagen, stock) VALUES (?, ?, ?, ?)',
-                     (request.form['nombre'], request.form['precio'], img_path, request.form['stock']))
-        conn.commit()
-        conn.close()
-    return redirect(url_for('admin_panel'))
+        # Leemos el Excel o CSV
+        df = pd.read_csv(file) # O pd.read_excel si prefieres .xlsx
+        for _, row in df.iterrows():
+            nuevo_p = Producto(
+                nombre=row['nombre'],
+                precio=row['precio'],
+                stock=row['stock'],
+                imagen='default.jpg' # Las fotos las subes luego manualmente
+            )
+            db.session.add(nuevo_p)
+        db.session.commit()
+    return redirect(url_for('admin'))
 
-# --- ACCIÓN: ELIMINAR PRODUCTO ---
-@app.route('/admin/delete/<int:id>')
-def delete_product(id):
-    conn = sqlite3.connect('ferreteria.db')
-    p = conn.execute('SELECT imagen FROM productos WHERE id = ?', (id,)).fetchone()
-    if p:
-        try:
-            # Borra la foto de la carpeta static/uploads
-            path_a_borrar = p[0].lstrip('/')
-            os.remove(os.path.join(os.getcwd(), path_a_borrar))
-        except:
-            pass
-    
-    conn.execute('DELETE FROM productos WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('admin_panel'))
+# ... (El resto de tus rutas de index y admin se mantienen igual)
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
