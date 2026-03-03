@@ -27,8 +27,17 @@ with app.app_context():
 # --- RUTA PRINCIPAL (CLIENTES) ---
 @app.route('/')
 def index():
-    productos = Producto.query.all()
-    return render_template('index.html', productos=productos)
+    # Capturamos lo que el usuario escribió en el buscador
+    busqueda = request.args.get('search')
+    
+    if busqueda:
+        # Filtramos: busca productos que CONTENGAN el texto (sin importar mayúsculas)
+        productos = Producto.query.filter(Producto.nombre.ilike(f"%{busqueda}%")).all()
+    else:
+        # Si no hay búsqueda, mostramos todo el inventario
+        productos = Producto.query.all()
+        
+    return render_template('index.html', productos=productos, busqueda=busqueda)
 
 # --- RUTA ADMINISTRADOR ---
 @app.route('/admin')
@@ -103,6 +112,7 @@ def vaciar_carrito():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
