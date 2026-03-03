@@ -1,15 +1,21 @@
 import os
 import pandas as pd
-from flask import Flask, render_template, request, redirect, url_for, session # Agrega session aquí
+from flask import Flask, render_template, request, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.utils import secure_filename # Nueva para nombres de archivos seguros
 
 app = Flask(__name__)
-app.secret_key = 'tu_clave_secreta_ferreteria'  # Necesaria para usar session
+app.secret_key = 'tu_clave_secreta_ferreteria'
 
-# Configuración de Base de Datos
+# Configuración de Base de Datos y Carpetas
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ferreteria.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# CREAR CARPETA DE FOTOS SI NO EXISTE
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
 db = SQLAlchemy(app)
 
 # Modelo de Producto
@@ -20,38 +26,59 @@ class Producto(db.Model):
     stock = db.Column(db.Integer)
     imagen = db.Column(db.String(200))
 
-# Crear la base de datos al iniciar
 with app.app_context():
     db.create_all()
 
 # --- RUTA PRINCIPAL (CLIENTES) ---
 @app.route('/')
 def index():
-    # Capturamos lo que el usuario escribió en el buscador
     busqueda = request.args.get('search')
-    
     if busqueda:
-        # Filtramos: busca productos que CONTENGAN el texto (sin importar mayúsculas)
         productos = Producto.query.filter(Producto.nombre.ilike(f"%{busqueda}%")).all()
     else:
-        # Si no hay búsqueda, mostramos todo el inventario
         productos = Producto.query.all()
-        
     return render_template('index.html', productos=productos, busqueda=busqueda)
 
-# --- RUTA ADMINISTRADOR ---
-@app.route('/admin')
+# --- RUTA ADMINISTRADOR (ACTUALIZADA PARA RECIBIR FOTOS) ---
+@app.route('/admin', methods=['GET', 'POST'])
 def admin():
+    if request.method == 'POST':
+        nombre = request.form.get('nombre')
+        precio = float(request.form.get('precio'))
+        stock = int(request.form.get('stock'))
+        
+        # Procesar la foto del teléfono
+        file = request.files.get('imagen_archivo')
+        url_final_imagen = "default.jpg" # Imagen por defecto
+
+        if file and file.filename != '':
+            filename = secure_filename(file.filename)
+            # Añadimos el nombre del producto al archivo para que sea único
+            filename = f"{nombre.replace(' ', '_')}_{filename}"
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            url_final_imagen = f"uploads/{filename}" # Se guarda la ruta relativa
+
+        nuevo_p = Producto(
+            nombre=nombre, 
+            precio=precio, 
+            stock=stock, 
+            imagen=url_final_imagen
+        )
+        db.session.add(nuevo_p)
+        db.session.commit()
+        return redirect(url_for('admin'))
+
+    # Si es GET, solo mostramos la lista
     productos = Producto.query.all()
     return render_template('admin.html', productos=productos)
 
-# --- RUTA PARA CARGA MASIVA ---
+# --- LAS DEMÁS RUTAS (Importar, Eliminar, Editar, Carrito) SE MANTIENEN IGUAL ---
+
 @app.route('/importar', methods=['POST'])
 def importar():
     file = request.files['archivo_excel']
     if file:
         try:
-            # Leemos el CSV
             df = pd.read_csv(file)
             for _, row in df.iterrows():
                 nuevo_p = Producto(
@@ -89,12 +116,8 @@ def agregar_al_carrito(id):
     producto = Producto.query.get(id)
     if not producto:
         return redirect(url_for('index'))
-    
-    # Si no hay carrito, creamos uno vacío
     if 'carrito' not in session:
         session['carrito'] = []
-    
-    # Guardamos los datos básicos del producto
     carrito = session['carrito']
     carrito.append({
         'id': producto.id,
@@ -112,6 +135,7 @@ def vaciar_carrito():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
