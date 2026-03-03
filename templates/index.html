@@ -44,14 +44,22 @@
     </nav>
 
     <div class="container mx-auto p-6">
-        <form action="/" method="GET" class="mb-10 max-w-2xl mx-auto flex gap-2">
-            <input type="text" name="search" placeholder="¿Qué herramienta buscas hoy?" 
-                   value="{{ busqueda if busqueda }}"
-                   class="flex-1 p-4 border-2 border-blue-100 rounded-xl shadow-sm focus:border-blue-500 focus:outline-none transition-all">
-            <button type="submit" class="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 transition shadow-lg">
-                Buscar
-            </button>
-        </form>
+        <form action="/" method="GET" class="mb-10 max-w-2xl mx-auto flex gap-2 relative">
+    <div class="relative flex-1">
+        <input type="text" name="search" placeholder="¿Qué herramienta buscas?" 
+               value="{{ busqueda if busqueda }}"
+               class="w-full p-4 pr-12 border-2 border-blue-100 rounded-xl shadow-sm focus:border-blue-500 focus:outline-none">
+        
+        {% if busqueda %}
+            <a href="/" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 font-bold text-xl" title="Limpiar búsqueda">
+                ✕
+            </a>
+        {% endif %}
+    </div>
+    <button type="submit" class="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 shadow-lg">
+        Buscar
+    </button>
+</form>
         
         {% if busqueda %}
             <p class="mb-4 text-gray-600 italic">Resultados para: "<strong>{{ busqueda }}</strong>"</p>
