@@ -1,9 +1,10 @@
 import os
 import pandas as pd
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, session # Agrega session aquí
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.secret_key = 'tu_clave_secreta_ferreteria'  # Necesaria para usar session
 
 # Configuración de Base de Datos
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ferreteria.db'
@@ -74,9 +75,35 @@ def editar(id):
         db.session.commit()
     return redirect(url_for('admin'))
 
+@app.route('/agregar_al_carrito/<int:id>')
+def agregar_al_carrito(id):
+    producto = Producto.query.get(id)
+    if not producto:
+        return redirect(url_for('index'))
+    
+    # Si no hay carrito, creamos uno vacío
+    if 'carrito' not in session:
+        session['carrito'] = []
+    
+    # Guardamos los datos básicos del producto
+    carrito = session['carrito']
+    carrito.append({
+        'id': producto.id,
+        'nombre': producto.nombre,
+        'precio': producto.precio
+    })
+    session['carrito'] = carrito
+    return redirect(url_for('index'))
+
+@app.route('/vaciar_carrito')
+def vaciar_carrito():
+    session.pop('carrito', None)
+    return redirect(url_for('index'))
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
