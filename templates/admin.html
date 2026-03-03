@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -55,25 +55,53 @@
         <hr class="my-10">
 
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <h2 class="text-xl font-semibold p-4 bg-gray-50 border-b">Productos en Stock</h2>
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-gray-100 text-gray-700">
-                        <th class="p-4 border-b">Nombre</th>
-                        <th class="p-4 border-b">Precio</th>
-                        <th class="p-4 border-b">Stock</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for producto in productos %}
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-4 border-b">{{ producto.nombre }}</td>
-                        <td class="p-4 border-b">${{ producto.precio }}</td>
-                        <td class="p-4 border-b text-center">{{ producto.stock }} unidades</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <h2 class="text-xl font-semibold p-4 bg-gray-50 border-b">Control de Inventario</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700">
+                            <th class="p-4 border-b">Nombre del Producto</th>
+                            <th class="p-4 border-b">Precio</th>
+                            <th class="p-4 border-b">Stock</th>
+                            <th class="p-4 border-b text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for producto in productos %}
+                        <tr class="hover:bg-gray-50 border-b">
+                            <form action="/editar/{{ producto.id }}" method="POST" class="flex">
+                                <td class="p-2 border-b">
+                                    <input type="text" name="nombre" value="{{ producto.nombre }}" 
+                                           class="w-full border rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                                </td>
+                                <td class="p-2 border-b">
+                                    <input type="number" name="precio" step="0.01" value="{{ producto.precio }}" 
+                                           class="w-24 border rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                                </td>
+                                <td class="p-2 border-b">
+                                    <input type="number" name="stock" value="{{ producto.stock }}" 
+                                           class="w-20 border rounded px-2 py-1 text-sm focus:border-blue-500 outline-none">
+                                </td>
+                                <td class="p-2 border-b text-center">
+                                    <div class="flex justify-center gap-2">
+                                        <button type="submit" title="Guardar cambios" 
+                                                class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition shadow-sm text-xs font-bold">
+                                            Guardar
+                                        </button>
+                                        
+                                        <a href="/eliminar/{{ producto.id }}" 
+                                           onclick="return confirm('¿Seguro que quieres borrar este producto?')"
+                                           class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition shadow-sm text-xs font-bold">
+                                            Borrar
+                                        </a>
+                                    </div>
+                                </td>
+                            </form>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="text-center mt-8">
