@@ -33,10 +33,16 @@ with app.app_context():
 @app.route('/')
 def index():
     busqueda = request.args.get('search')
+    
     if busqueda:
-        productos = Producto.query.filter(Producto.nombre.ilike(f"%{busqueda}%")).all()
+        # 1. Quitamos espacios y pasamos a MAYÚSCULAS para que coincida con tu DB
+        termino = busqueda.strip().upper()
+        
+        # 2. Buscamos productos que contengan ese término
+        productos = Producto.query.filter(Producto.nombre.ilike(f"%{termino}%")).all()
     else:
         productos = Producto.query.all()
+        
     return render_template('index.html', productos=productos, busqueda=busqueda)
 
 # --- RUTA ADMINISTRADOR (ACTUALIZADA PARA RECIBIR FOTOS) ---
@@ -135,6 +141,7 @@ def vaciar_carrito():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
