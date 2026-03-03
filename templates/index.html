@@ -8,24 +8,64 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body class="bg-gray-50">
-    <nav class="bg-blue-700 p-4 shadow-lg text-white text-center">
-        <h1 class="text-2xl font-extrabold"><i class="fas fa-tools mr-2"></i>FERRETERÍA PRO</h1>
+
+    <nav class="bg-blue-700 p-4 shadow-lg text-white">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-extrabold tracking-tight">
+                <i class="fas fa-tools mr-2"></i>FERRETERÍA PRO
+            </h1>
+            <span class="hidden md:inline text-sm bg-blue-800 px-3 py-1 rounded-full">Ventas Online</span>
+        </div>
     </nav>
+
     <div class="container mx-auto p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <form action="/" method="GET" class="mb-10 max-w-2xl mx-auto flex gap-2">
+            <input type="text" name="search" placeholder="¿Qué herramienta buscas hoy?" 
+                   value="{{ busqueda if busqueda }}"
+                   class="flex-1 p-4 border-2 border-blue-100 rounded-xl shadow-sm focus:border-blue-500 focus:outline-none transition-all">
+            <button type="submit" class="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 transition shadow-lg">
+                Buscar
+            </button>
+        </form>
+        
+        {% if busqueda %}
+            <p class="mb-4 text-gray-600 italic">Resultados para: "<strong>{{ busqueda }}</strong>"</p>
+        {% endif %}
+
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-gray-800">Catálogo de Productos</h2>
+            <p class="text-gray-600 italic">Haz clic en el botón para pedir por WhatsApp</p>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for p in productos %}
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border">
-                <img src="{{ p.imagen }}" class="w-full h-48 object-cover">
+            <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
+                <div class="h-48 overflow-hidden bg-gray-200">
+                    <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="w-full h-full object-cover">
+                </div>
+                
                 <div class="p-5">
-                    <h3 class="text-lg font-bold">{{ p.nombre }}</h3>
-                    <p class="text-2xl font-black text-blue-600">${{ p.precio }}</p>
-                    <a href="{{ p.link_ws }}" target="_blank" class="block mt-4 bg-green-500 text-white text-center py-3 rounded-lg font-bold hover:bg-green-600 transition">
-                        <i class="fab fa-whatsapp mr-2"></i>Pedir por WhatsApp
+                    <h3 class="text-lg font-bold text-gray-800 mb-2">{{ p.nombre }}</h3>
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-2xl font-black text-blue-600">${{ p.precio }}</span>
+                        <span class="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded">Stock: {{ p.stock }}</span>
+                    </div>
+
+                    <a href="https://wa.me/573016426407?text=Hola!%20Me%20interesa%20el%20producto:%20{{ p.nombre }}" 
+                       target="_blank" 
+                       class="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 w-full shadow-md">
+                        <i class="fab fa-whatsapp mr-2 text-xl"></i>
+                        Pedir por WhatsApp
                     </a>
                 </div>
             </div>
             {% endfor %}
         </div>
     </div>
+
+    <footer class="mt-12 py-6 bg-gray-800 text-center text-gray-400 text-sm">
+        &copy; 2026 Sistema de Ventas Ferretería Digital - Creado por Alexander G. Todos los derechos reservados.
+    </footer>
+
 </body>
 </html>
