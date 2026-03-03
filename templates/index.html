@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ferretería Digital - Catálogo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-blue-700 p-4 shadow-lg text-white text-center">
+        <h1 class="text-2xl font-extrabold"><i class="fas fa-tools mr-2"></i>FERRETERÍA PRO</h1>
+    </nav>
+    <div class="container mx-auto p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for p in productos %}
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden border">
+                <img src="{{ p.imagen }}" class="w-full h-48 object-cover">
+                <div class="p-5">
+                    <h3 class="text-lg font-bold">{{ p.nombre }}</h3>
+                    <p class="text-2xl font-black text-blue-600">${{ p.precio }}</p>
+                    <a href="{{ p.link_ws }}" target="_blank" class="block mt-4 bg-green-500 text-white text-center py-3 rounded-lg font-bold hover:bg-green-600 transition">
+                        <i class="fab fa-whatsapp mr-2"></i>Pedir por WhatsApp
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
