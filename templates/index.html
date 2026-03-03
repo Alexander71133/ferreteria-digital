@@ -6,6 +6,31 @@
     <title>Ferretería Digital - Catálogo</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Animación para que el botón "brinque" al pasar el mouse */
+        .btn-pop:active {
+            transform: scale(0.95);
+        }
+        
+        /* Animación de entrada para el carrito flotante */
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .cart-animate {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Efecto de pulso para el botón de WhatsApp final */
+        .pulse-green {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+    </style>
 </head>
 <body class="bg-gray-50">
 
@@ -51,11 +76,11 @@
                         <span class="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded">Stock: {{ p.stock }}</span>
                     </div>
 
-                    <a href="https://wa.me/573016426407?text=Hola!%20Me%20interesa%20el%20producto:%20{{ p.nombre }}" 
-                       target="_blank" 
-                       class="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-300 w-full shadow-md">
-                        <i class="fab fa-whatsapp mr-2 text-xl"></i>
-                        Pedir por WhatsApp
+                    <a href="/agregar_al_carrito/{{ p.id }}" 
+                       class="btn-pop flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-transform active:scale-95 w-full shadow-md">
+                        <i class="fas fa-cart-plus mr-2 text-xl"></i>
+                        Añadir al Carrito
+                    </a>
                     </a>
                 </div>
             </div>
@@ -66,6 +91,45 @@
     <footer class="mt-12 py-6 bg-gray-800 text-center text-gray-400 text-sm">
         &copy; 2026 Sistema de Ventas Ferretería Digital - Creado por Alexander G. Todos los derechos reservados.
     </footer>
+{% if session['carrito'] %}
+    <div class="fixed bottom-6 right-6 z-50 w-80 cart-animate">
+        <div class="bg-white rounded-2xl shadow-2xl border-2 border-green-500 overflow-hidden">
+            <div class="bg-green-500 p-3 text-white flex justify-between items-center">
+                <h3 class="font-bold"><i class="fas fa-shopping-basket mr-2"></i>Tu Pedido</h3>
+                <span class="bg-white text-green-600 text-xs px-2 py-1 rounded-full font-bold">
+                    {{ session['carrito']|length }} items
+                </span>
+            </div>
+            
+            <div class="p-4">
+                <ul class="max-h-48 overflow-y-auto mb-4">
+                    {% set total = dict(valor=0) %}
+                    {% for item in session['carrito'] %}
+                        <li class="flex justify-between text-sm mb-2 border-b pb-1">
+                            <span class="text-gray-700">{{ item.nombre }}</span>
+                            <span class="font-bold text-blue-600">${{ item.precio }}</span>
+                            {% if total.update({'valor': total.valor + item.precio|float}) %}{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
 
+                <div class="flex justify-between items-center mb-4 pt-2 border-t-2">
+                    <span class="font-bold text-gray-800">TOTAL:</span>
+                    <span class="text-xl font-black text-green-600">${{ total.valor }}</span>
+                </div>
+                
+                <a href="https://wa.me/573016426407?text=Hola!%20Este%20es%20mi%20pedido:%20{% for i in session['carrito'] %}-%20{{ i.nombre }}%20(${{ i.precio }})%0A{% endfor %}%0ATotal:%20${{ total.valor }}" 
+                   target="_blank"
+                   class="pulse-green block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-colors">
+                    <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
+                </a>
+                
+                <a href="/vaciar_carrito" class="block text-center text-xs text-red-500 mt-3 hover:underline">
+                    <i class="fas fa-trash-alt mr-1"></i>Vaciar carrito y empezar de nuevo
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </body>
 </html>
