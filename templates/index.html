@@ -66,7 +66,9 @@
             {% for p in productos %}
             <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
                 <div class="h-48 overflow-hidden bg-gray-200">
-                    <img src="{{ p.imagen }}" alt="{{ p.nombre }}" class="w-full h-full object-cover">
+                    <img src="{% if 'http' in p.imagen %}{{ p.imagen }}{% elif '/' in p.imagen %}{{ url_for('static', filename=p.imagen) }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
+     alt="{{ p.nombre }}" 
+     class="w-full h-full object-cover">
                 </div>
                 
                 <div class="p-5">
