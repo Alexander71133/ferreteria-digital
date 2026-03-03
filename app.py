@@ -56,9 +56,28 @@ def importar():
             print(f"Error al importar: {e}")
     return redirect(url_for('admin'))
 
+@app.route('/eliminar/<int:id>')
+def eliminar(id):
+    producto = Producto.query.get(id)
+    if producto:
+        db.session.delete(producto)
+        db.session.commit()
+    return redirect(url_for('admin'))
+
+@app.route('/editar/<int:id>', methods=['POST'])
+def editar(id):
+    producto = Producto.query.get(id)
+    if producto:
+        producto.nombre = request.form.get('nombre')
+        producto.precio = float(request.form.get('precio'))
+        producto.stock = int(request.form.get('stock'))
+        db.session.commit()
+    return redirect(url_for('admin'))
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
