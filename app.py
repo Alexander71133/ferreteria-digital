@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # Configuración de Base de Datos
-app.config['SQLALCHEMY_DATABASE_DATABASE_URI'] = 'sqlite:///ferreteria.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ferreteria.db'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
 db = SQLAlchemy(app)
 
@@ -40,5 +40,6 @@ def importar():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
