@@ -40,7 +40,7 @@ def home():
         p = dict(row)
         # RECUERDA: Cambia el número abajo por tu WhatsApp real
         msg = urllib.parse.quote(f"Hola, me interesa el {p['nombre']}")
-        p['link_ws'] = f"https://wa.me/573000000000?text={msg}"
+        p['link_ws'] = f"https://wa.me/573016426407?text={msg}"
         productos.append(p)
     
     return render_template('index.html', productos=productos, busqueda=search)
