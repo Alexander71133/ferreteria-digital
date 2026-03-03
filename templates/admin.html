@@ -14,22 +14,29 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
             
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h2 class="text-xl font-semibold mb-4 text-gray-700">Añadir Producto Individual</h2>
-                <form action="/admin" method="POST" enctype="multipart/form-data">
-                    <div class="mb-4">
-                        <label class="block text-gray-600">Nombre del Producto</label>
-                        <input type="text" name="nombre" class="w-full border rounded p-2" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-600">Precio</label>
-                        <input type="number" name="precio" step="0.01" class="w-full border rounded p-2" required>
-                    </div>
-                    <div class="mb-4">
-                        <label class="block text-gray-600">Stock Inicial</label>
-                        <input type="number" name="stock" class="w-full border rounded p-2" required>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">
-                        Guardar Producto
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Añadir Producto Individual</h2>
+    <form action="/admin" method="POST" enctype="multipart/form-data">
+        <div class="mb-4">
+            <label class="block text-gray-600">Nombre del Producto</label>
+            <input type="text" name="nombre" class="w-full border rounded p-2" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600">Precio</label>
+            <input type="number" name="precio" step="0.01" class="w-full border rounded p-2" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600">Stock Inicial</label>
+            <input type="number" name="stock" class="w-full border rounded p-2" required>
+        </div>
+        <div class="mb-4">
+            <label class="block text-gray-600">Foto del Producto</label>
+            <input type="file" name="imagen_archivo" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700">
+            Guardar Producto
+        </button>
+    </form>
+</div>
                     </button>
                 </form>
             </div>
