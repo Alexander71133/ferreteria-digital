@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -102,62 +102,57 @@
         &copy; 2026 Sistema de Ventas Ferretería Digital - Creado por Alexander G. Todos los derechos reservados.
     </footer>
 {% if session['carrito'] %}
-    <div class="fixed bottom-6 right-6 z-50 w-80 cart-animate">
-        <div class="bg-white rounded-2xl shadow-2xl border-2 border-green-500 overflow-hidden">
-            <div class="bg-green-500 p-3 text-white flex justify-between items-center">
-                <h3 class="font-bold"><i class="fas fa-shopping-basket mr-2"></i>Tu Pedido</h3>
-                <span class="bg-white text-green-600 text-xs px-2 py-1 rounded-full font-bold">
-                    {{ session['carrito']|length }} items
-                </span>
-            </div>
-            
-            <div class="p-4">
-                <ul class="max-h-48 overflow-y-auto mb-4">
-                    <ul class="max-h-48 overflow-y-auto mb-4">
-            {% set total = dict(valor=0) %}
-            {% for item in session['carrito'] %}
-            <li class="flex flex-col border-b border-gray-100 py-3">
-                <div class="flex justify-between items-start mb-2">
-                    <span class="text-xs font-bold text-gray-700 uppercase flex-1 pr-2">{{ item.nombre }}</span>
-                    <span class="text-sm font-black text-blue-600">${{ item.precio }}</span>
-                </div>
-                
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
-                        <a href="/modificar_cantidad/{{ item.id }}/restar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500 hover:text-red-500" style="text-decoration: none;">−</a>
-                        <span class="px-3 text-xs font-bold text-gray-700">{{ item.cantidad if item.cantidad else 1 }}</span>
-                        <a href="/modificar_cantidad/{{ item.id }}/sumar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500 hover:text-green-600" style="text-decoration: none;">+</a>
-                    </div>
-                    {% set subtotal = (item.precio|float * (item.cantidad|int if item.cantidad else 1)) %}
-                    {% if total.update({'valor': total.valor + subtotal}) %}{% endif %}
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-
-        <div class="flex justify-between items-center mb-4 pt-2 border-t-2">
-            <span class="font-bold text-gray-800">TOTAL:</span>
-            <span class="text-xl font-black text-green-600">${{ total.valor }}</span>
+<div class="fixed bottom-6 right-6 z-50 w-80 cart-animate">
+    <div class="bg-white rounded-2xl shadow-2xl border-2 border-green-500 overflow-hidden">
+        <div class="bg-green-500 p-3 text-white flex justify-between items-center">
+            <h3 class="font-bold"><i class="fas fa-shopping-basket mr-2"></i>Tu Pedido</h3>
+            <span class="bg-white text-green-600 text-xs px-2 py-1 rounded-full font-bold">
+                {{ session['carrito']|length }} items
+            </span>
         </div>
 
-        <a href="https://wa.me/573016426407?text=Hola!%20Pedido:%20{% for i in session['carrito'] %}-%20({{ i.cantidad if i.cantidad else 1 }})%20{{ i.nombre }}%20{% endfor %}"
-           target="_blank"
-           class="pulse-green block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-colors">
-            <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
-        </a>
-                
-                <a href="https://wa.me/573016426407?text=Hola!%20Este%20es%20mi%20pedido:%20{% for i in session['carrito'] %}-%20{{ i.nombre }}%20(${{ i.precio }})%0A{% endfor %}%0ATotal:%20${{ total.valor }}" 
-                   target="_blank"
-                   class="pulse-green block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-colors">
-                    <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
-                </a>
-                
-                <a href="/vaciar_carrito" class="block text-center text-xs text-red-500 mt-3 hover:underline">
-                    <i class="fas fa-trash-alt mr-1"></i>Vaciar carrito y empezar de nuevo
-                </a>
+        <div class="p-4">
+            <ul class="max-h-48 overflow-y-auto mb-4">
+                {% set total = dict(valor=0) %}
+                {% for item in session['carrito'] %}
+                <li class="flex flex-col border-b border-gray-100 py-3">
+                    <div class="flex justify-between items-start mb-1">
+                        <span class="text-xs font-bold text-gray-700 uppercase flex-1 pr-2">{{ item.nombre }}</span>
+                        <span class="text-sm font-black text-blue-600">${{ item.precio }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
+                            <a href="/modificar_cantidad/{{ item.id }}/restar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500 hover:text-red-500" style="text-decoration: none;">−</a>
+                            <span class="px-3 text-xs font-bold text-gray-700">{{ item.cantidad if item.cantidad else 1 }}</span>
+                            <a href="/modificar_cantidad/{{ item.id }}/sumar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500 hover:text-green-600" style="text-decoration: none;">+</a>
+                        </div>
+                        
+                        {% set subtotal = (item.precio|float * (item.cantidad|int if item.cantidad else 1)) %}
+                        {% if total.update({'valor': total.valor + subtotal}) %}{% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <div class="flex justify-between items-center mb-4 pt-2 border-t-2">
+                <span class="font-bold text-gray-800">TOTAL:</span>
+                <span class="text-xl font-black text-green-600">${{ total.valor }}</span>
             </div>
+
+            <a href="https://wa.me/573016426407?text=Hola!%20Pedido:%20{% for i in session['carrito'] %}-%20({{ i.cantidad if i.cantidad else 1 }})%20{{ i.nombre }}%20{% endfor %}"
+               target="_blank"
+               class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-all transform active:scale-95"
+               style="text-decoration: none;">
+                <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
+            </a>
+
+            <a href="/vaciar_carrito" class="block text-center text-red-400 text-xs mt-4 hover:text-red-600">
+                <i class="fas fa-trash mr-1"></i> Vaciar carrito y empezar de nuevo
+            </a>
         </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 </body>
 </html>
