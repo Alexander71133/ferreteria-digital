@@ -103,11 +103,12 @@
                     <span class="text-xl font-black text-green-600">${{ total_carrito.valor }}</span>
                 </div>
 
-                <a href="https://wa.me/573016426407?text=Hola!%20Pedido:%20{% for i in session['carrito'] %}-%20({{ i.cantidad if i.cantidad else 1 }})%20{{ i.nombre }}%20{% endfor %}%0A%0A*TOTAL:%20${{ total_carrito.valor }}*"
-                   target="_blank"
-                   class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg">
-                    <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
-                </a>
+                <a href="https://wa.me/573016426407?text=Hola!%20Este%20es%20mi%20Pedido:%0A{% set m_t = dict(v=0) %}{% for i in session['carrito'] %}-%20({{ i.cantidad if i.cantidad else 1 }})%20{{ i.nombre }}%0A{% if m_t.update({'v': m_t.v + (i.precio|float * (i.cantidad|int if i.cantidad else 1))}) %}{% endif %}{% endfor %}%0A*TOTAL%20A%20PAGAR:%20${{ m_t.v }}*"
+   target="_blank"
+   class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-all"
+   style="text-decoration: none;">
+    <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
+</a>
 
                 <a href="/vaciar_carrito" class="block text-center text-red-400 text-xs mt-4">Vaciar carrito</a>
             </div>
