@@ -7,29 +7,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Animación para que el botón "brinque" al pasar el mouse */
-        .btn-pop:active {
-            transform: scale(0.95);
-        }
-        
-        /* Animación de entrada para el carrito flotante */
+        .btn-pop:active { transform: scale(0.95); }
         @keyframes slideIn {
             from { transform: translateY(20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-        .cart-animate {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        /* Efecto de pulso para el botón de WhatsApp final */
-        .pulse-green {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
+        .cart-animate { animation: slideIn 0.3s ease-out; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -45,51 +28,39 @@
 
     <div class="container mx-auto p-6">
         <form action="/" method="GET" class="mb-10 max-w-2xl mx-auto flex gap-2 relative">
-    <div class="relative flex-1">
-        <input type="text" name="search" placeholder="¿Qué herramienta buscas?" 
-               value="{{ busqueda | default('') }}" 
-               class="w-full p-4 pr-12 border-2 border-blue-100 rounded-xl shadow-sm focus:border-blue-500 focus:outline-none">
-        
-        {% if busqueda %}
-            <a href="/" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 font-bold text-xl" title="Limpiar búsqueda">
-                ✕
-            </a>
-        {% endif %}
-    </div>
-    <button type="submit" class="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 shadow-lg">
-        Buscar
-    </button>
-</form>
+            <div class="relative flex-1">
+                <input type="text" name="search" placeholder="¿Qué herramienta buscas?" 
+                       value="{{ busqueda if busqueda else '' }}" 
+                       class="w-full p-4 pr-12 border-2 border-blue-100 rounded-xl shadow-sm focus:border-blue-500 focus:outline-none">
+                
+                {% if busqueda %}
+                    <a href="/" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 font-bold text-xl">✕</a>
+                {% endif %}
+            </div>
+            <button type="submit" class="bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 shadow-lg">
+                Buscar
+            </button>
+        </form>
         
         {% if busqueda %}
             <p class="mb-4 text-gray-600 italic">Resultados para: "<strong>{{ busqueda }}</strong>"</p>
         {% endif %}
 
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8">
-            <h2 class="text-3xl font-bold text-gray-800">Catálogo de Productos</h2>
-            <p class="text-gray-600 italic">Tu compra en segundos</p>
-        </div>
-        
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for p in productos %}
             <div class="bg-white rounded-xl shadow-sm hover:shadow-xl transition-shadow duration-300 overflow-hidden border border-gray-100">
                 <div class="h-48 overflow-hidden bg-gray-200">
                     <img src="{% if 'http' in p.imagen %}{{ p.imagen }}{% elif '/' in p.imagen %}{{ url_for('static', filename=p.imagen) }}{% else %}{{ url_for('static', filename='uploads/' + p.imagen) }}{% endif %}" 
-     alt="{{ p.nombre }}" 
-     class="w-full h-full object-cover">
+                         class="w-full h-full object-cover">
                 </div>
-                
                 <div class="p-5">
                     <h3 class="text-lg font-bold text-gray-800 mb-2">{{ p.nombre }}</h3>
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-2xl font-black text-blue-600">${{ p.precio }}</span>
                         <span class="text-xs font-medium bg-green-100 text-green-700 px-2 py-1 rounded">Stock: {{ p.stock }}</span>
                     </div>
-
-                    <a href="/agregar_al_carrito/{{ p.id }}" 
-                       class="btn-pop flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-transform active:scale-95 w-full shadow-md">
-                        <i class="fas fa-cart-plus mr-2 text-xl"></i>
-                        Añadir al Carrito
+                    <a href="/agregar_al_carrito/{{ p.id }}" class="btn-pop flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg w-full">
+                        <i class="fas fa-cart-plus mr-2 text-xl"></i> Añadir al Carrito
                     </a>
                 </div>
             </div>
@@ -97,62 +68,52 @@
         </div>
     </div>
 
-    <footer class="mt-12 py-6 bg-gray-800 text-center text-gray-400 text-sm">
-        &copy; 2026 Sistema de Ventas Ferretería Digital - Creado por Alexander G. Todos los derechos reservados.
-    </footer>
-{% if session['carrito'] %}
-<div class="fixed bottom-6 right-6 z-50 w-80 cart-animate">
-    <div class="bg-white rounded-2xl shadow-2xl border-2 border-green-500 overflow-hidden">
-        <div class="bg-green-500 p-3 text-white flex justify-between items-center">
-            <h3 class="font-bold"><i class="fas fa-shopping-basket mr-2"></i>Tu Pedido</h3>
-            <span class="bg-white text-green-600 text-xs px-2 py-1 rounded-full font-bold">
-                {{ session['carrito']|length }} items
-            </span>
-        </div>
-
-        <div class="p-4">
-            <ul class="max-h-48 overflow-y-auto mb-4">
-                {% set total = dict(valor=0) %}
-                {% for item in session['carrito'] %}
-                <li class="flex flex-col border-b border-gray-100 py-3">
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-xs font-bold text-gray-700 uppercase flex-1 pr-2">{{ item.nombre }}</span>
-                        <span class="text-sm font-black text-blue-600">${{ item.precio }}</span>
-                    </div>
-                    
-                    <div class="flex justify-between items-center">
-                        <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
-                            <a href="/modificar_cantidad/{{ item.id }}/restar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500 hover:text-red-500" style="text-decoration: none;">−</a>
-                            <span class="px-3 text-xs font-bold text-gray-700">{{ item.cantidad if item.cantidad else 1 }}</span>
-                            <a href="/modificar_cantidad/{{ item.id }}/sumar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500 hover:text-green-600" style="text-decoration: none;">+</a>
-                        </div>
-                        
-                        {% set subtotal = (item.precio|float * (item.cantidad|int if item.cantidad else 1)) %}
-                        {% if total.update({'valor': total.valor + subtotal}) %}{% endif %}
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
-
-            <div class="flex justify-between items-center mb-4 pt-2 border-t-2">
-                <span class="font-bold text-gray-800">TOTAL:</span>
-                <span class="text-xl font-black text-green-600">${{ total.valor }}</span>
+    {% if session['carrito'] %}
+    <div class="fixed bottom-6 right-6 z-50 w-80 cart-animate">
+        <div class="bg-white rounded-2xl shadow-2xl border-2 border-green-500 overflow-hidden">
+            <div class="bg-green-500 p-3 text-white flex justify-between items-center">
+                <h3 class="font-bold"><i class="fas fa-shopping-basket mr-2"></i>Tu Pedido</h3>
+                <span class="bg-white text-green-600 text-xs px-2 py-1 rounded-full font-bold">{{ session['carrito']|length }} items</span>
             </div>
 
-            <a href="https://wa.me/573016426407?text=Hola!%20Mi%20pedido%20tiene%20un%20total%20de:%20${{ total.valor|round(2) }}"
-                target="_blank"
-                class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-all transform active:scale-95"
-                style="text-decoration: none;">
-                <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
-            </a>
+            <div class="p-4">
+                <ul class="max-h-48 overflow-y-auto mb-4">
+                    {% set total_carrito = dict(valor=0) %}
+                    {% for item in session['carrito'] %}
+                        <li class="flex flex-col border-b border-gray-100 py-3">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-xs font-bold text-gray-700 uppercase flex-1">{{ item.nombre }}</span>
+                                <span class="text-sm font-black text-blue-600">${{ item.precio }}</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center bg-gray-50 rounded-lg p-1 border border-gray-200">
+                                    <a href="/modificar_cantidad/{{ item.id }}/restar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500">−</a>
+                                    <span class="px-3 text-xs font-bold text-gray-700">{{ item.cantidad if item.cantidad else 1 }}</span>
+                                    <a href="/modificar_cantidad/{{ item.id }}/sumar" class="w-7 h-7 flex items-center justify-center bg-white rounded-md shadow-sm text-gray-500">+</a>
+                                </div>
+                                {% set subtotal = (item.precio|float * (item.cantidad|int if item.cantidad else 1)) %}
+                                {% if total_carrito.update({'valor': total_carrito.valor + subtotal}) %}{% endif %}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
 
-            <a href="/vaciar_carrito" class="block text-center text-red-400 text-xs mt-4 hover:text-red-600">
-                <i class="fas fa-trash mr-1"></i> Vaciar carrito y empezar de nuevo
-            </a>
+                <div class="flex justify-between items-center mb-4 pt-2 border-t-2">
+                    <span class="font-bold text-gray-800">TOTAL:</span>
+                    <span class="text-xl font-black text-green-600">${{ total_carrito.valor }}</span>
+                </div>
+
+                <a href="https://wa.me/573016426407?text=Hola!%20Pedido:%20{% for i in session['carrito'] %}-%20({{ i.cantidad if i.cantidad else 1 }})%20{{ i.nombre }}%20{% endfor %}%0A%0A*TOTAL:%20${{ total_carrito.valor }}*"
+                   target="_blank"
+                   class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg">
+                    <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
+                </a>
+
+                <a href="/vaciar_carrito" class="block text-center text-red-400 text-xs mt-4">Vaciar carrito</a>
+            </div>
         </div>
     </div>
-</div>
-{% endif %}
+    {% endif %}
 </body>
 </html>
 </div>
