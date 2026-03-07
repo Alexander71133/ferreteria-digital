@@ -153,25 +153,24 @@ def vaciar_carrito():
     session.pop('carrito', None)
     return redirect(url_for('index'))
 
-@app.route('/modificar_cantidad/<int:id>/<string:accion>')
+@app.route('/modificar_cantidad/<int:id>/<accion>')
 def modificar_cantidad(id, accion):
-    if 'carrito' in session:
-        carrito = session['carrito']
-        for item in carrito:
-            if item['id'] == id:
-                if accion == 'sumar':
-                    item['cantidad'] = item.get('cantidad', 1) + 1
-                elif accion == 'restar':
-                    item['cantidad'] = item.get('cantidad', 1) - 1
-                    # Si llega a 0, lo dejamos en 1 o podrías eliminarlo
-                    if item['cantidad'] < 1: item['cantidad'] = 1
-                break
-        session['carrito'] = carrito
+    carrito = session.get('carrito', [])
+    for item in carrito:
+        if item['id'] == id:
+            if accion == 'sumar':
+                item['cantidad'] = item.get('cantidad', 1) + 1
+            elif accion == 'restar' and item.get('cantidad', 1) > 1:
+                item['cantidad'] -= 1
+            break
+    session['carrito'] = carrito
+    session.modified = True
     return redirect(url_for('index'))
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
 
 
 
