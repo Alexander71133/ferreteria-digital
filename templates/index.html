@@ -47,7 +47,7 @@
         <form action="/" method="GET" class="mb-10 max-w-2xl mx-auto flex gap-2 relative">
     <div class="relative flex-1">
         <input type="text" name="search" placeholder="¿Qué herramienta buscas?" 
-               value="{{ busqueda if busqueda }}"
+               value="{{ busqueda | default('') }}" 
                class="w-full p-4 pr-12 border-2 border-blue-100 rounded-xl shadow-sm focus:border-blue-500 focus:outline-none">
         
         {% if busqueda %}
@@ -90,7 +90,6 @@
                        class="btn-pop flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-transform active:scale-95 w-full shadow-md">
                         <i class="fas fa-cart-plus mr-2 text-xl"></i>
                         Añadir al Carrito
-                    </a>
                     </a>
                 </div>
             </div>
@@ -140,10 +139,10 @@
                 <span class="text-xl font-black text-green-600">${{ total.valor }}</span>
             </div>
 
-            <a href="https://wa.me/573016426407?text=Hola!%20Pedido:%20{% for i in session['carrito'] %}-%20({{ i.cantidad if i.cantidad else 1 }})%20{{ i.nombre }}%20{% endfor %}"
-               target="_blank"
-               class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-all transform active:scale-95"
-               style="text-decoration: none;">
+            <a href="https://wa.me/573016426407?text=Hola!%20Mi%20pedido%20tiene%20un%20total%20de:%20${{ total.valor|round(2) }}"
+                target="_blank"
+                class="block w-full bg-green-500 hover:bg-green-600 text-white text-center py-3 rounded-xl font-bold shadow-lg transition-all transform active:scale-95"
+                style="text-decoration: none;">
                 <i class="fab fa-whatsapp mr-2"></i> Enviar Pedido
             </a>
 
@@ -152,6 +151,10 @@
             </a>
         </div>
     </div>
+</div>
+{% endif %}
+</body>
+</html>
 </div>
 {% endif %}
 </body>
